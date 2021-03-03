@@ -3,7 +3,7 @@
 module.exports = function (sequelize, DataTypes) {
   let Role = sequelize.define('Role',
     {
-      title: {
+      name: {
         type: DataTypes.STRING(20)
       },
       description: {
@@ -16,10 +16,6 @@ module.exports = function (sequelize, DataTypes) {
       isDeleted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
-      },
-      ownRecordsOnly: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
       },
       isDeleteAble: {
         type: DataTypes.BOOLEAN,

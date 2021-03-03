@@ -259,7 +259,7 @@ function loginPhone (input) {
       roleData = role
       let query = ''
 
-      if (role.id == 2) {
+      if (role.id === 2) {
         query = 'SELECT `id`,`RegionId` FROM `Supervisors` WHERE `UserId`=' + userData.userInfo.id
       } else if (role.id == 3) {
         query = 'SELECT `id`,`RegionId` FROM `Internees` WHERE `UserId`=' + userData.userInfo.id
