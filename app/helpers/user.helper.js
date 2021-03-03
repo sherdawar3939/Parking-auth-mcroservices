@@ -45,7 +45,7 @@ function signUp (input) {
       const errorsArray = []
       // check user existence
       if (user) {
-        if (user.phone == userObj.phone) {
+        if (user.phone === userObj.phone) {
           // user phone already exist.
           errorsArray.push({
             field: 'phone',
@@ -136,6 +136,21 @@ function login (input) {
         }])
       }
       userData.userInfo.role = role.name
+      let query = ''
+      if (role.id === 2) {
+        query = `select id from Clients where UserId = ${userData.userInfo.id}`
+      }
+
+      if (query) {
+        await db.sequelize.query(query, {
+          type: db.sequelize.QueryTypes.SELECT
+        })
+          .then((result) => {
+            if (result && result.length) {
+              userData.userInfo.employeeId = result[0].id
+            }
+          })
+      }
 
       await db.Permission.findAll({
         where: { RoleId: userData.userInfo.RoleId },
