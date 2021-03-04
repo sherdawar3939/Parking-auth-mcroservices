@@ -62,13 +62,13 @@ const validateSignUp = (req, res, done) => {
   // }
 
   // RoleId is required, validating as not empty, valid numeric value with range.
-  // if (!body.RoleId || isNaN(body.RoleId) || body.RoleId < 1 || body.RoleId > 9999999) {
-  //   errorArray.push({
-  //     field: 'RoleId',
-  //     error: 1013,
-  //     message: '\'RoleId\' is required as numeric, range must be between 1 and 9999999.'
-  //   })
-  // }
+  if (!body.RoleId || isNaN(body.RoleId) || body.RoleId < 1 || body.RoleId > 9999999) {
+    errorArray.push({
+      field: 'RoleId',
+      error: 1013,
+      message: '\'RoleId\' is required as numeric, range must be between 1 and 9999999.'
+    })
+  }
 
   // password is required, validating it as not empty, valid String and length range.
   if (_.isEmpty(body.password) || !_.isString(body.password) || body.password.length < 8 || body.password.length > 16) {
@@ -103,7 +103,7 @@ const validateSignUp = (req, res, done) => {
   validatedData.phone = body.phone
   validatedData.password = body.password
   // validatedData.language = body.language
-  // validatedData.RoleId = body.RoleId
+  validatedData.RoleId = body.RoleId
 
   req.validatedBody = validatedData
   done()

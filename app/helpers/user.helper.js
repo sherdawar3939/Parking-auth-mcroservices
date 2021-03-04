@@ -13,7 +13,6 @@ function signUp (input) {
   let now = new Date()
   now.setMinutes(now.getMinutes() + 10) // timestamp
   now = new Date(now) // Date object
-
   let userObj = {
     fName: input.fName,
     lName: input.lName,
@@ -22,7 +21,7 @@ function signUp (input) {
     otpValidTill: now,
     phone: input.phone,
     language: input.language,
-    RoleId: input.RoleId || 1
+    RoleId: input.RoleId || 2
     // signupDevice: input.signupDevice || null
   }
 
