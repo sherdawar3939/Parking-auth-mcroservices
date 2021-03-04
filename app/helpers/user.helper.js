@@ -53,7 +53,7 @@ function signUp (input) {
           })
         }
 
-        if (user.email == userObj.email) {
+        if (user.email === userObj.email) {
           // user email already exist.
           errorsArray.push({
             field: 'email',
@@ -137,7 +137,7 @@ function login (input) {
       userData.userInfo.role = role.name
       let query = ''
       if (role.id === 2) {
-        query = `select id from Clients where UserId = ${userData.userInfo.id}`
+        query = `select id from Clients where UserId = ${userData.userInfo.id} and isProfile = true`
       }
 
       if (query) {
@@ -145,6 +145,7 @@ function login (input) {
           type: db.sequelize.QueryTypes.SELECT
         })
           .then((result) => {
+            console.log(result)
             if (result && result.length) {
               userData.userInfo.employeeId = result[0].id
             }
@@ -260,7 +261,7 @@ function loginPhone (input) {
 
       if (role.id === 2) {
         query = 'SELECT `id`,`RegionId` FROM `Supervisors` WHERE `UserId`=' + userData.userInfo.id
-      } else if (role.id == 3) {
+      } else if (role.id === 3) {
         query = 'SELECT `id`,`RegionId` FROM `Internees` WHERE `UserId`=' + userData.userInfo.id
       } else {
         // Active and not deleted role not found, throw error
@@ -415,7 +416,7 @@ const resetPassword = (input) => {
       }
 
       // Validate otp
-      if (user.otp != input.otp || !input.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
+      if (user.otp !== input.otp || !input.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
         return generalHelpingMethods.rejectPromise([{
           field: 'otp',
           error: 1570,
@@ -456,7 +457,7 @@ const resetPasswordPhone = (input) => {
       }
 
       // Validate otp
-      if (user.otp != input.otp || !input.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
+      if (user.otp !== input.otp || !input.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
         return generalHelpingMethods.rejectPromise([{
           field: 'otp',
           error: 1570,
@@ -655,7 +656,7 @@ function verifyOtp (input) {
       user.otp = parseInt(user.otp, 10)
 
       // matching otp against user verification code
-      if (otp != user.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
+      if (otp !== user.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
         return generalHelpingMethods.rejectPromise([{
           field: 'email',
           error: 1581,
@@ -775,7 +776,7 @@ function addNewUser (input) {
       newUser.hashedPassword = newUser.encryptPassword(input.password, newUser.salt)
       await newUser.save()
 
-      if (input.RoleId == 2) { // This is supervisor
+      if (input.RoleId === 2) { // This is supervisor
         db.sequelize.query('INSERT INTO Supervisors (firstName, lastName, email, phoneNo, UserId, createdAt, updatedAt) VALUES (:fName, :lName, :email, :phone, :userId, :dateTime, :dateTime);', {
           replacements: {
             ...userObj, userId: newUser.id, dateTime: new Date().toLocaleString()
