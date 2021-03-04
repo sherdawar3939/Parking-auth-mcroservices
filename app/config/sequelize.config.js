@@ -62,8 +62,8 @@ Object.keys(db).forEach(function (modelName) {
 // Caution: Do not set FORCE_DB_SYNC to true for every run to avoid losing data with restarts
 sequelize
   .sync({
-    // force: config.FORCE_DB_SYNC === 'true',
-    force: false,
+    force: config.FORCE_DB_SYNC === 'true',
+    // force: false,
     logging: config.enableSequelizeLog === 'true' ? winston.verbose : false
   })
   .then(function () {
