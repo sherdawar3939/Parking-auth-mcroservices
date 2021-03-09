@@ -658,11 +658,7 @@ function verifyOtp (input) {
     .then((user) => {
       if (!user) {
         // user not found, throw error
-        return generalHelpingMethods.rejectPromise([{
-          field: 'email',
-          error: 1578,
-          message: 'No user found against this phone'
-        }])
+        return false
       }
 
       // user.otp = parseInt(user.otp, 10)
