@@ -82,7 +82,7 @@ const sendEmail = async (options) => {
     // port: 2525,
     auth: {
       user: 'hamzaaslam769@gmail.com',
-      pass: 'password'
+      pass: 'lion1356192'
     }
     // Activate in gmail "less secure app" option
   })
@@ -95,7 +95,7 @@ const sendEmail = async (options) => {
     html: `<h1>Email Confirmation</h1>
     <h2>Hello ${options.userName}</h2>
     <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
-    <a href=http://localhost:3001/auth/api/v1/confirm/${options.confirmationCode}> Click here</a>
+    <a href=http://localhost:4200/auth/verify/${options.code}/${options.email}> Click here</a>
     </div>`
   }
   // 3 actually send the email

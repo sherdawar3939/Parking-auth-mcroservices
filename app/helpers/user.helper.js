@@ -75,7 +75,7 @@ function signUp (input) {
       try {
         await generalHelpingMethods.sendEmail({
           email: newUser.email,
-          confirmationCode: newUser.otp,
+          code: newUser.otp,
           userName: newUser.fName
         })
       } catch (err) {
@@ -665,7 +665,7 @@ function verifyOtp (input) {
         }])
       }
 
-      user.otp = parseInt(user.otp, 10)
+     // user.otp = parseInt(user.otp, 10)
 
       // matching otp against user verification code
       if (otp !== user.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {

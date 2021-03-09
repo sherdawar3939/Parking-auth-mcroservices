@@ -745,7 +745,7 @@ const verifyOtp = (req, res, done) => {
   }
 
   // otp is required, validating as not empty, valid numeric value with range.
-  if (!body.otp || isNaN(body.otp) || body.otp < 1000 || body.otp > 9999) {
+  if (!body.otp) {
     errorArray.push({
       field: 'otp',
       error: 1193,
