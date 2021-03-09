@@ -665,15 +665,11 @@ function verifyOtp (input) {
         }])
       }
 
-     // user.otp = parseInt(user.otp, 10)
+      // user.otp = parseInt(user.otp, 10)
 
       // matching otp against user verification code
       if (otp !== user.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
-        return generalHelpingMethods.rejectPromise([{
-          field: 'email',
-          error: 1581,
-          message: 'Failed to Verify email, invalid otp or it is expired.'
-        }])
+        return false
       }
 
       user.otp = ''
