@@ -763,24 +763,7 @@ const verifyOtp = (req, res, done) => {
   req.conditions = validatedBody
   done()
 }
-const validateOtp = (req, res, done) => {
-  const errorArray = []
-  console.log('middleware call', req.params.otp)
-  // Validating as not empty, valid String and length range.
-  if (_.isEmpty(req.params.otp) || !_.isString(req.params.otp) || req.params.otp < 8
-  ) {
-    errorArray.push({
-      field: 'email',
-      error: 1059,
-      message: 'Please provide only valid \'email\' as string, length must be between 5 and 100.'
-    })
-  }
 
-  if (!_.isEmpty(errorArray)) {
-    return generalMiddleware.standardErrorResponse(req, res, errorArray, 'user.middleware.resendOtp')
-  }
-  done()
-}
 const resendOtp = (req, res, done) => {
   const errorArray = []
   const body = req.body
@@ -975,6 +958,5 @@ module.exports = {
   validateDeleteUser,
   validateAddNewUser,
   validatePhoneLoginCredentials,
-  validateCurrentUserProfile,
-  validateOtp
+  validateCurrentUserProfile
 }

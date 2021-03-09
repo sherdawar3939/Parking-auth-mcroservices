@@ -30,7 +30,6 @@ module.exports = function (app, apiVersion) {
   // user-signup
   app.post(route + '/sign-up', userMiddleware.validateSignUp, userController.signUp)
 
-  app.get(route + '/confirm/:otp', userMiddleware.validateOtp, userController.confirmUser)
   // resend verification otp.
   app.post(route + '/resend-otp', userMiddleware.resendOtp, userController.resendOtp)
 

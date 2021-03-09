@@ -54,26 +54,16 @@ const changePassword = function (req, res) {
 
 // Verify email
 const verifyOtp = function (req, res) {
-  return userHelper.verifyOtp(req.body)
+  return userHelper.verifyOtp(req.body, res)
     .then(function (data) {
-      generalController.successResponse(req, res, 'Phone Verified successfully.', data, 'user.controller.verifyOtp')
+      generalController.successResponse(req, res, 'Email Verified successfully.', data, 'user.controller.verifyOtp')
     }).catch(StandardError, function (err) {
       generalController.errorResponse(req, res, err, null, 'user.controller.verifyOtp', SERVER_RESPONSE.VALIDATION_ERROR)
     }).catch(function (err) {
       generalController.errorResponse(req, res, err, 'Please check originalError for details', 'user.controller.verifyOtp', SERVER_RESPONSE.INTERNAL_SERVER_ERROR)
     })
 }
-// confirm user
-const confirmUser = (req, res) => {
-  return userHelper.confirmUserHelper(req.params.otp)
-    .then(function (data) {
-      generalController.successResponse(req, res, 'User confirm  successfully.', data, 'user.controller.confirmUser')
-    }).catch(StandardError, function (err) {
-      generalController.errorResponse(req, res, err, null, 'user.controller.confirmUser', SERVER_RESPONSE.VALIDATION_ERROR)
-    }).catch(function (err) {
-      generalController.errorResponse(req, res, err, 'Please check originalError for details', 'user.controller.confirmUser', SERVER_RESPONSE.INTERNAL_SERVER_ERROR)
-    })
-}
+
 // Resend Otp
 const resendOtp = function (req, res) {
   return userHelper.resendOtp(req.body)
@@ -255,6 +245,5 @@ module.exports = {
   resendOtp,
   resendOtpPhone,
   addNewUser,
-  updateCurrentUserProfile,
-  confirmUser
+  updateCurrentUserProfile
 }

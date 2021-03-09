@@ -648,8 +648,8 @@ const deleteUser = (input) => {
     })
 }
 
-// Verify phone
-function verifyOtp (input) {
+// Verify email
+function verifyOtp (input, res) {
   let email = input.email
   let otp = input.otp
 
@@ -658,14 +658,18 @@ function verifyOtp (input) {
     .then((user) => {
       if (!user) {
         // user not found, throw error
-        return false
+        return res.json({
+          data: false
+        })
       }
 
       // user.otp = parseInt(user.otp, 10)
 
       // matching otp against user verification code
       if (otp !== user.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
-        return false
+        return res.json({
+          data: false
+        })
       }
 
       user.otp = ''
