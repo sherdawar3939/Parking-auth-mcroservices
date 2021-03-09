@@ -518,7 +518,7 @@ const validateUpdateUser = (req, res, done) => {
   let id = req.params.id
   const validatedData = {}
 
-  if (req.user.RoleId == 1) {
+  if (req.user.RoleId === 1) {
     // password is an optional numeric property, if it is given than validate it.
     if (body.hasOwnProperty('password') && body.password) {
       // password is required, validating it as not empty, valid String and length range.
@@ -763,7 +763,24 @@ const verifyOtp = (req, res, done) => {
   req.conditions = validatedBody
   done()
 }
+const validateOtp = (req, res, done) => {
+  const errorArray = []
+  console.log('middleware call', req.params.otp)
+  // Validating as not empty, valid String and length range.
+  if (_.isEmpty(req.params.otp) || !_.isString(req.params.otp) || req.params.otp < 8
+  ) {
+    errorArray.push({
+      field: 'email',
+      error: 1059,
+      message: 'Please provide only valid \'email\' as string, length must be between 5 and 100.'
+    })
+  }
 
+  if (!_.isEmpty(errorArray)) {
+    return generalMiddleware.standardErrorResponse(req, res, errorArray, 'user.middleware.resendOtp')
+  }
+  done()
+}
 const resendOtp = (req, res, done) => {
   const errorArray = []
   const body = req.body
@@ -958,5 +975,6 @@ module.exports = {
   validateDeleteUser,
   validateAddNewUser,
   validatePhoneLoginCredentials,
-  validateCurrentUserProfile
+  validateCurrentUserProfile,
+  validateOtp
 }

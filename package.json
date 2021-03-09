@@ -32,12 +32,14 @@
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "mysql2": "^1.7.0",
+    "nodemailer": "^6.5.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "path": "^0.12.7",
     "sequelize": "^5.21.3",
     "standard": "^12.0.1",
     "standard-error": "^1.1.0",
+    "uuid": "^3.4.0",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {

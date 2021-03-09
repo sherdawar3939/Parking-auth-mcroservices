@@ -7,7 +7,7 @@ var PromiseReturns = require('bluebird')
 var StandardError = require('standard-error')
 var _ = require('lodash')
 var fs = require('fs')
-
+var nodemailer = require('nodemailer')
 // Check if user has permission or not
 function checkIfUserHasPermission (permissionName, permissionsArray) {
   for (let i = 0; i < permissionsArray.length; i++) {
@@ -73,11 +73,40 @@ function uploadImageToS3 (imageFile) {
     }
   })
 }
+const sendEmail = async (options) => {
+  // create a transporter
+  const transporter = nodemailer.createTransport({
 
+    service: 'gmail',
+    // host: 'smtp.mailtrap.io',
+    // port: 2525,
+    auth: {
+      user: 'hamzaaslam769@gmail.com',
+      pass: 'password'
+    }
+    // Activate in gmail "less secure app" option
+  })
+  // define email option
+  const mailOption = {
+    from: '<hamzaaslam769@gmail.com>',
+    to: options.email,
+    subject: 'Please confirm your account',
+    text: options.message,
+    html: `<h1>Email Confirmation</h1>
+    <h2>Hello ${options.userName}</h2>
+    <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+    <a href=http://localhost:3001/auth/api/v1/confirm/${options.confirmationCode}> Click here</a>
+    </div>`
+  }
+  // 3 actually send the email
+  await transporter.sendMail(mailOption)
+}
 module.exports = {
   checkIfUserHasPermission,
   rejectPromise,
   catchException,
   putS3Object,
-  uploadImageToS3
+  uploadImageToS3,
+  sendEmail
+
 }

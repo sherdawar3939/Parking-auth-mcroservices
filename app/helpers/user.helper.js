@@ -1,11 +1,12 @@
 'use strict'
+var uuid = require('uuid/v4')
+
 const SERVER_RESPONSE = require('../config/serverResponses')
 const db = require('../config/sequelize.config')
 const generalHelpingMethods = require('./general.helper')
 const helpingHelperMethods = require('./helping.helper')
 const _ = require('lodash')
 const Op = db.Sequelize.Op
-
 /// ///
 
 // User signUp
@@ -17,7 +18,7 @@ function signUp (input) {
     fName: input.fName,
     lName: input.lName,
     email: input.email || '',
-    otp: Math.round(Math.random() * 9000 + 1000),
+    otp: uuid(),
     otpValidTill: now,
     phone: input.phone,
     language: input.language,
@@ -71,7 +72,18 @@ function signUp (input) {
       await newUser.save()
 
       // send verification email/sms code here
+      try {
+        await generalHelpingMethods.sendEmail({
+          email: newUser.email,
+          confirmationCode: newUser.otp,
+          userName: newUser.fName
+        })
+      } catch (err) {
+        console.log(err)
+        return err
+      }
 
+      // end send email
       return {
         id: newUser.id,
         fName: newUser.fName,
@@ -89,7 +101,7 @@ function signUp (input) {
 }
 
 // user Login
-function login (input) {
+const login = async (input) => {
   let email = input.email
   let password = input.password
   let userData = {}
@@ -670,7 +682,26 @@ function verifyOtp (input) {
       return true
     })
 }
+const confirmUserHelper = (otp) => {
+  console.log('helper ', otp)
+  return db.User.findOne({ where: { otp, isBlocked: false } })
+    .then((user) => {
+      if (!user) {
+        // user not found, throw error
+        return generalHelpingMethods.rejectPromise([{
+          field: 'otp',
+          error: 1583,
+          message: 'Invalid otp'
+        }])
+      }
 
+      user.isVerified = true
+      user.save()
+
+      // Send otp
+      return true
+    })
+}
 // Resend otp
 function resendOtp (input) {
   let email = input.email
@@ -819,5 +850,6 @@ module.exports = {
   resendOtpPhone,
   addNewUser,
   loginPhone,
-  updateCurrentUserProfile
+  updateCurrentUserProfile,
+  confirmUserHelper
 }
