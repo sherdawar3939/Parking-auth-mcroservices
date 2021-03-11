@@ -157,7 +157,6 @@ const login = async (input) => {
           type: db.sequelize.QueryTypes.SELECT
         })
           .then((result) => {
-            console.log(result)
             if (result && result.length) {
               userData.userInfo.employeeId = result[0].id
             }
