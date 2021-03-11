@@ -72,15 +72,12 @@ function signUp (input) {
       await newUser.save()
 
       // send verification email/sms code here
-      try {
-        await generalHelpingMethods.sendEmail({
-          email: newUser.email,
-          code: newUser.otp,
-          userName: newUser.fName
-        })
-      } catch (err) {
 
-      }
+      await generalHelpingMethods.sendEmail({
+        email: newUser.email,
+        code: newUser.otp,
+        userName: newUser.fName
+      })
 
       // end send email
       return {
