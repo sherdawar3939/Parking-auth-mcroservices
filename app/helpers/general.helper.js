@@ -82,7 +82,7 @@ const sendEmail = async (options) => {
     // port: 2525,
     auth: {
       user: 'hamzaaslam769@gmail.com',
-      pass: 'lion1356192'
+      pass: 'enterPassword'
     }
     // Activate in gmail "less secure app" option
   })

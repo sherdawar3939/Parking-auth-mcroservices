@@ -15,7 +15,7 @@ let newConfig = {
   }
 }
 
-function uploadFile(file) {
+function uploadFile (file) {
   return new Promise(function (resolve, reject) {
     var stream = fs.createReadStream(file.path)
     var name = Date.now().toString() + '.pdf'
