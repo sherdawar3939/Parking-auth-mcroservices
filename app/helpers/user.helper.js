@@ -79,8 +79,7 @@ function signUp (input) {
           userName: newUser.fName
         })
       } catch (err) {
-        console.log(err)
-        return err
+
       }
 
       // end send email
