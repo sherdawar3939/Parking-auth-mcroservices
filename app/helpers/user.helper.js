@@ -45,6 +45,7 @@ function signUp (input) {
       const errorsArray = []
       // check user existence
       if (user) {
+        console.log(user)
         if (user.phone === userObj.phone) {
           // user phone already exist.
           errorsArray.push({
