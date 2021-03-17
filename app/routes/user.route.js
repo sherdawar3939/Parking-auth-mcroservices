@@ -67,4 +67,6 @@ module.exports = function (app, apiVersion) {
 
   // delete user
   app.delete(route + '/user/:id', passport.authenticate('jwt', { session: false }), userMiddleware.validateDeleteUser, userController.deleteUser)
+
+  app.get(`${route}/refresh-token`, passport.authenticate('jwt', { session: false }), userController.refreshToken)
 }

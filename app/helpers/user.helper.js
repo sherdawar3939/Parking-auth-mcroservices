@@ -823,7 +823,118 @@ function addNewUser (input) {
       console.log('error ======>>', error)
     })
 }
+const refreshTokenHelper = (id) => {
+  let userData = {}
 
+  // check if email exist and isDeleted equal to false
+  return db.User.findOne({ where: { id, isDeleted: false } })
+    .then((user) => {
+      if (!user) {
+        // user not found, throw error
+        return generalHelpingMethods.rejectPromise([{
+          field: 'id',
+          error: 1540,
+          message: 'Invalid user id'
+        }])
+      } else {
+        // convert mongoose document object to plain json object and return user
+        return user.toJSON()
+      }
+    })
+    .then((user) => {
+      userData.userInfo = user
+      return db.Role.findOne({
+        where: {
+          id: user.RoleId,
+          isDeleted: false,
+          isActive: true }
+      })
+    })
+    .then(async (role) => {
+      if (!role) {
+        // Active and not deleted role not found, throw error
+        return generalHelpingMethods.rejectPromise([{
+          field: 'Role',
+          error: 1546,
+          message: 'Role is not defined'
+        }])
+      }
+      userData.userInfo.role = role.name
+      let query = ''
+      if (role.id === 2) {
+        query = `select id from Clients where UserId = ${userData.userInfo.id} and isProfile = true`
+      }
+
+      if (query) {
+        await db.sequelize.query(query, {
+          type: db.sequelize.QueryTypes.SELECT
+        })
+          .then((result) => {
+            if (result && result.length) {
+              userData.userInfo.employeeId = result[0].id
+            }
+          })
+      }
+
+      await db.Permission.findAll({
+        where: { RoleId: userData.userInfo.RoleId },
+        attributes: ['ModuleActionId']
+      })
+        .then(async (result) => {
+          if (result) {
+            let moduleActionIds = result.map(x => x.ModuleActionId)
+            await db.Module.findAll({
+              attributes: ['title', 'identifier'],
+              include: [
+                {
+                  model: db.Action,
+                  required: true,
+                  as: 'actions',
+                  attributes: ['title', 'identifier'],
+                  through: {
+                    where: { id: moduleActionIds },
+                    attributes: []
+                  }
+                }
+              ]
+            }).then(result => {
+              userData.userInfo.permissions = result
+            })
+          } else {
+            userData.userInfo.permissions = []
+          }
+        })
+
+      const tokenData = {
+        id: userData.userInfo.id,
+        fName: userData.userInfo.fName,
+        lName: userData.userInfo.lName,
+        email: userData.userInfo.email,
+        phone: userData.userInfo.phone,
+        RoleId: userData.userInfo.RoleId,
+        role: role.name
+      }
+
+      if (userData.userInfo.employeeId) {
+        tokenData.employeeId = userData.userInfo.employeeId
+      }
+
+      userData.userInfo = {
+        ...tokenData,
+        permissions: userData.userInfo.permissions,
+        isVerified: userData.userInfo.isVerified,
+        isBlocked: userData.userInfo.isBlocked,
+        language: userData.userInfo.language
+      }
+
+      return helpingHelperMethods.signLoginData({ data: tokenData })
+    })
+    .then((tokenData) => {
+      userData.tokenInfo = tokenData
+      return userData
+    })
+    .catch(generalHelpingMethods.catchException)
+}
 module.exports = {
   signUp,
   login,
@@ -842,5 +953,6 @@ module.exports = {
   addNewUser,
   loginPhone,
   updateCurrentUserProfile,
-  confirmUserHelper
+  confirmUserHelper,
+  refreshTokenHelper
 }

@@ -225,7 +225,16 @@ const addNewUser = function (req, res) {
       generalController.errorResponse(req, res, err, 'Please check originalError for details', 'user.controller.addNewUser', SERVER_RESPONSE.INTERNAL_SERVER_ERROR)
     })
 }
-
+const refreshToken = (req, res) => {
+  return userHelper.refreshTokenHelper(req.user.id)
+    .then((data) => {
+      generalController.successResponse(req, res, 'User refreshToken successfully.', data, 'user.controller.refreshToken')
+    }).catch(StandardError, (err) => {
+      generalController.errorResponse(req, res, err, null, 'user.controller.refreshToken', SERVER_RESPONSE.VALIDATION_ERROR)
+    }).catch((err) => {
+      generalController.errorResponse(req, res, err, 'Please check originalError for details', 'user.controller.refreshToken', SERVER_RESPONSE.INTERNAL_SERVER_ERROR)
+    })
+}
 module.exports = {
   signUp,
   login,
@@ -245,5 +254,6 @@ module.exports = {
   resendOtp,
   resendOtpPhone,
   addNewUser,
-  updateCurrentUserProfile
+  updateCurrentUserProfile,
+  refreshToken
 }
