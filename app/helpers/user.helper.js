@@ -74,7 +74,7 @@ function signUp (input) {
 
       // send verification email/sms code here
 
-      await generalHelpingMethods.sendEmail({
+      generalHelpingMethods.sendEmail({
         email: newUser.email,
         code: newUser.otp,
         userName: newUser.fName
