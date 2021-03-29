@@ -1,5 +1,4 @@
 'use strict'
-var uuid = require('uuid/v4')
 
 const SERVER_RESPONSE = require('../config/serverResponses')
 const db = require('../config/sequelize.config')
@@ -7,7 +6,6 @@ const generalHelpingMethods = require('./general.helper')
 const helpingHelperMethods = require('./helping.helper')
 const _ = require('lodash')
 const Op = db.Sequelize.Op
-/// ///
 
 // User signUp
 function signUp (input) {
@@ -18,7 +16,7 @@ function signUp (input) {
     fName: input.fName,
     lName: input.lName,
     email: input.email || '',
-    otp: uuid(),
+    otp: input.otp,
     otpValidTill: now,
     phone: input.phone,
     language: input.language,
@@ -26,17 +24,23 @@ function signUp (input) {
     // signupDevice: input.signupDevice || null
   }
 
+  const userFindConditions = []
+  if (userObj.email) {
+    userFindConditions.push({
+      email: userObj.email
+    })
+  }
+
+  if (userObj.phone) {
+    userFindConditions.push({
+      phone: userObj.phone
+    })
+  }
+
   // check if input phone already exist
   return db.User.findOne({
     where: {
-      [Op.or]: [
-        {
-          phone: userObj.phone
-        },
-        {
-          email: userObj.email
-        }
-      ],
+      [Op.or]: userFindConditions,
       isDeleted: false
     }
   })
@@ -45,7 +49,6 @@ function signUp (input) {
       const errorsArray = []
       // check user existence
       if (user) {
-        console.log(user)
         if (user.phone === userObj.phone) {
           // user phone already exist.
           errorsArray.push({
@@ -73,7 +76,6 @@ function signUp (input) {
       await newUser.save()
 
       // send verification email/sms code here
-
       generalHelpingMethods.sendEmail({
         email: newUser.email,
         code: newUser.otp,
@@ -98,7 +100,7 @@ function signUp (input) {
 }
 
 // user Login
-const login = async (input) => {
+const login = (input) => {
   let email = input.email
   let password = input.password
   let userData = {}
@@ -598,6 +600,7 @@ const updateUser = (id, data) => {
       return user.toJSON()
     })
 }
+
 // update current user profile
 const updateCurrentUserProfile = (conditions, data) => {
   console.log('print conditions', conditions)
@@ -654,18 +657,14 @@ function verifyOtp (input, res) {
     .then((user) => {
       if (!user) {
         // user not found, throw error
-        return res.json({
-          data: false
-        })
+        return false
       }
 
       // user.otp = parseInt(user.otp, 10)
 
       // matching otp against user verification code
       if (otp !== user.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
-        return res.json({
-          data: false
-        })
+        return false
       }
 
       user.otp = ''
@@ -674,6 +673,7 @@ function verifyOtp (input, res) {
       return true
     })
 }
+
 const confirmUserHelper = (otp) => {
   console.log('helper ', otp)
   return db.User.findOne({ where: { otp, isBlocked: false } })
@@ -694,6 +694,7 @@ const confirmUserHelper = (otp) => {
       return true
     })
 }
+
 // Resend otp
 function resendOtp (input) {
   let email = input.email
@@ -824,6 +825,7 @@ function addNewUser (input) {
       console.log('error ======>>', error)
     })
 }
+
 const refreshTokenHelper = (id) => {
   let userData = {}
 
@@ -936,6 +938,7 @@ const refreshTokenHelper = (id) => {
     })
     .catch(generalHelpingMethods.catchException)
 }
+
 module.exports = {
   signUp,
   login,

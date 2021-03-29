@@ -2,7 +2,7 @@
 
 // successResponse
 function successResponse (req, res, message, data, type) {
-  return res.jsonp(data ? {
+  return res.jsonp(data != null ? {
     status: 'Success',
     message: message,
     data: data

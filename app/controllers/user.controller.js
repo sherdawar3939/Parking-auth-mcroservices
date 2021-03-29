@@ -54,7 +54,7 @@ const changePassword = function (req, res) {
 
 // Verify email
 const verifyOtp = function (req, res) {
-  return userHelper.verifyOtp(req.body, res)
+  return userHelper.verifyOtp(req.body)
     .then(function (data) {
       generalController.successResponse(req, res, 'Email Verified successfully.', data, 'user.controller.verifyOtp')
     }).catch(StandardError, function (err) {
