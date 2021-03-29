@@ -73,12 +73,12 @@ function signUp (input) {
       await newUser.save()
 
       // send verification email/sms code here
-
-      await generalHelpingMethods.sendEmail({
-        email: newUser.email,
-        code: newUser.otp,
-        userName: newUser.fName
-      })
+      const html = `<h1>Email Confirmation</h1>
+      <h2>Hello ${newUser.fName}</h2>
+      <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+      <a href=http://localhost:4200/auth/verify/${newUser.otp}/${newUser.email}> Click here</a>
+      </div>`
+      await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', newUser.email, 'Please confirm your account', 'message', html)
 
       // end send email
       return {
