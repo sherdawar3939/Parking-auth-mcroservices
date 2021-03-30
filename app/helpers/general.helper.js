@@ -75,23 +75,26 @@ function uploadImageToS3 (imageFile) {
 }
 
 const sendEmail = async (fromEmail, toEmail, subject, textMessage, htmlPage) => {
-  // create a transporter
-  const transporter = nodemailer.createTransport({
-
+  let mailService = {
     // service: 'gmail',
-    host: 'smtp.mailtrap.io',
-    port: 2525,
-    // host: 'mail.webhudlab.com',
-    // port: 465,
-    // secure: true,
+    host: 'mail.webhudlab.com',
+    port: 465,
+    secure: true,
     auth: {
-      user: 'c07e8050785455',
-      pass: '497702da1f6e4a'
-    //  user: 'admin@webhudlab.com',
-      // pass: '^RAUt[(.Gls%'
+      user: 'admin@webhudlab.com' || process.env.EMAIL_USER,
+      pass: '^RAUt[(.Gls%' || process.env.EMAIL_PASS
     }
-    // Activate in gmail "less secure app" option
-  })
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    mailService.host = 'smtp.mailtrap.io'
+    mailService.port = 2525
+    mailService.auth.user = 'c07e8050785455'
+    mailService.auth.pass = '497702da1f6e4a'
+    mailService.secure = false
+  }
+  // create a transporter
+  const transporter = nodemailer.createTransport(mailService)
   // define email option
   const mailOption = {
     from: fromEmail,
@@ -104,12 +107,34 @@ const sendEmail = async (fromEmail, toEmail, subject, textMessage, htmlPage) => 
   await transporter.sendMail(mailOption)
 }
 
-const getTemplate = (data) => {
-  return `<h1>Email Confirmation</h1>
-  <h2>Hello ${data.name}</h2>
-  <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
-  <a href=http://localhost:4200/auth/verify/${data.otp}/${data.email}> Click here</a>
-  </div>`
+const getTemplate = (type, data) => {
+  let html = ''
+  let ref = 'http://parking-api.webhudlab.com/auth/verify/'
+  if (process.env.NODE_ENV !== 'production') {
+    ref = 'http://localhost:4200/auth/verify/'
+  }
+  switch (type) {
+    case 'registration':
+      html = `<h1>Email Confirmation</h1>
+      <h2>Hello ${data.name}</h2>
+      <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+      <a href=${ref}${data.otp}/${data.email}> Click here</a>`
+      break
+    case 'webForgetPassword':
+      html = `<h1>Email Confirmation</h1>
+      <h2>Hello ${data.name}</h2>
+      <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+      <a href=${ref}${data.otp}/${data.email}> Click here</a>`
+      break
+    case 'appForgetPassword':
+      html = `<h1>Email Confirmation</h1>
+        <h2>Hello ${data.name}</h2>
+        <p>Your Otp number is</p>
+        <p>${data.otp}</p>`
+      break
+    default:
+  }
+  return html
 }
 module.exports = {
   checkIfUserHasPermission,

@@ -6,6 +6,7 @@ const generalHelpingMethods = require('./general.helper')
 const helpingHelperMethods = require('./helping.helper')
 const _ = require('lodash')
 const Op = db.Sequelize.Op
+const uuid = require('uuid/v4')
 
 // User signUp
 function signUp (input) {
@@ -76,7 +77,7 @@ function signUp (input) {
       await newUser.save()
 
       // send verification email/sms code here
-      const html = generalHelpingMethods.getTemplate({
+      const html = generalHelpingMethods.getTemplate('registration', {
         name: newUser.fName,
         email: newUser.email,
         otp: newUser.otp
@@ -386,24 +387,33 @@ function forgotPassword (conditions) {
           message: 'No user found against this phone/email'
         }])
       }
-
+      // console.log(user)
       let now = new Date()
       now.setMinutes(now.getMinutes() + 10) // timestamp
       now = new Date(now) // Date object
 
       user.otpValidTill = now
-      user.otp = Math.round(Math.random() * 9000 + 1000)
-      user.save().then(() => {
-        if (conditions.phone) {
-          // Send sms
-          console.log('Send sms', user)
-        } else {
-          // Send email
-          console.log('Send email', user)
+      user.otp = uuid()
+      if (user.dataValues.RoleId === 3 || user.dataValues.RoleId === 4) {
+        user.otp = Math.round(Math.random() * 9000 + 1000)
+      }
+      return user.save().then(async (response) => {
+        let html
+        const data = {
+          name: response.dataValues.fName,
+          email: response.dataValues.email,
+          otp: response.otp
         }
+        if (response.dataValues.RoleId === 3 || response.dataValues.RoleId === 4) {
+          html = generalHelpingMethods.getTemplate('appForgetPassword', data)
+        } else {
+          html = generalHelpingMethods.getTemplate('webForgetPassword', data)
+        }
+        // Send email
+        await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', response.dataValues.email, 'Please confirm your account', 'message', html)
+        console.log('Send email', user)
+        return true
       })
-
-      return true
     })
 }
 
@@ -717,11 +727,27 @@ function resendOtp (input) {
       now = new Date(now) // Date object
 
       user.otpValidTill = now
-      user.otp = Math.round(Math.random() * 9000 + 1000)
-      user.save()
-
-      // Send otp
-      return true
+      user.otp = uuid()
+      if (user.dataValues.RoleId === 3 || user.dataValues.RoleId === 4) {
+        user.otp = Math.round(Math.random() * 9000 + 1000)
+      }
+      return user.save().then(async (response) => {
+        let html
+        const data = {
+          name: response.dataValues.fName,
+          email: response.dataValues.email,
+          otp: response.otp
+        }
+        if (response.dataValues.RoleId === 3 || response.dataValues.RoleId === 4) {
+          html = generalHelpingMethods.getTemplate('appForgetPassword', data)
+        } else {
+          html = generalHelpingMethods.getTemplate('webForgetPassword', data)
+        }
+        // Send email
+        await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', response.dataValues.email, 'Please confirm your account', 'message', html)
+        console.log('Send email', user)
+        return true
+      })
     })
 }
 
