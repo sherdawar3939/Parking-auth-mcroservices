@@ -73,30 +73,31 @@ function uploadImageToS3 (imageFile) {
     }
   })
 }
-const sendEmail = async (options) => {
+const sendEmail = async (fromEmail, toEmail, subject, textMessage, htmlPage) => {
   // create a transporter
   const transporter = nodemailer.createTransport({
 
     // service: 'gmail',
     host: 'smtp.mailtrap.io',
     port: 2525,
+    // host: 'mail.webhudlab.com',
+    // port: 465,
+    // secure: true,
     auth: {
       user: 'c07e8050785455',
       pass: '497702da1f6e4a'
+    //  user: 'admin@webhudlab.com',
+      // pass: '^RAUt[(.Gls%'
     }
     // Activate in gmail "less secure app" option
   })
   // define email option
   const mailOption = {
-    from: '<hamzaaslam769@gmail.com>',
-    to: options.email,
-    subject: 'Please confirm your account',
-    text: options.message,
-    html: `<h1>Email Confirmation</h1>
-    <h2>Hello ${options.userName}</h2>
-    <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
-    <a href=http://localhost:4200/auth/verify/${options.code}/${options.email}> Click here</a>
-    </div>`
+    from: fromEmail,
+    to: toEmail,
+    subject: subject,
+    text: textMessage,
+    html: htmlPage
   }
   // 3 actually send the email
   await transporter.sendMail(mailOption)
