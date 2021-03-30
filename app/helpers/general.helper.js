@@ -73,6 +73,7 @@ function uploadImageToS3 (imageFile) {
     }
   })
 }
+
 const sendEmail = async (fromEmail, toEmail, subject, textMessage, htmlPage) => {
   // create a transporter
   const transporter = nodemailer.createTransport({
@@ -102,12 +103,21 @@ const sendEmail = async (fromEmail, toEmail, subject, textMessage, htmlPage) => 
   // 3 actually send the email
   await transporter.sendMail(mailOption)
 }
+
+const getTemplate = (data) => {
+  return `<h1>Email Confirmation</h1>
+  <h2>Hello ${data.name}</h2>
+  <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+  <a href=http://localhost:4200/auth/verify/${data.otp}/${data.email}> Click here</a>
+  </div>`
+}
 module.exports = {
   checkIfUserHasPermission,
   rejectPromise,
   catchException,
   putS3Object,
   uploadImageToS3,
-  sendEmail
+  sendEmail,
+  getTemplate
 
 }

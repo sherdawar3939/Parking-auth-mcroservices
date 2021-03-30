@@ -73,21 +73,12 @@ function signUp (input) {
       await newUser.save()
 
       // send verification email/sms code here
-<<<<<<< HEAD
-      const html = `<h1>Email Confirmation</h1>
-      <h2>Hello ${newUser.fName}</h2>
-      <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
-      <a href=http://localhost:4200/auth/verify/${newUser.otp}/${newUser.email}> Click here</a>
-      </div>`
-      await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', newUser.email, 'Please confirm your account', 'message', html)
-=======
-
-      generalHelpingMethods.sendEmail({
+      const html = generalHelpingMethods.getTemplate({
+        name: newUser.fName,
         email: newUser.email,
-        code: newUser.otp,
-        userName: newUser.fName
+        otp: newUser.otp
       })
->>>>>>> 4ae601a062cd48e07c13ce076c841bdb88531399
+      await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', newUser.email, 'Please confirm your account', 'message', html)
 
       // end send email
       return {
