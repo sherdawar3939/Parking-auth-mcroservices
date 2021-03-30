@@ -110,10 +110,10 @@ const validateSignUp = (req, res, done) => {
   // validatedData.language = body.language
   validatedData.RoleId = body.RoleId
 
-  if (validatedData.RoleId == 2) {
-    validatedData.otp = uuid()
-  } else if (validatedData.RoleId == 3) {
+  if (validatedData.RoleId == 3) {
     validatedData.otp = Math.round(Math.random() * 9000 + 1000)
+  } else {
+    validatedData.otp = uuid()
   }
 
   req.validatedBody = validatedData
