@@ -82,7 +82,7 @@ const sendEmail = async (fromEmail, toEmail, subject, textMessage, htmlPage) => 
     secure: true,
     auth: {
       user: 'admin@webhudlab.com' || process.env.EMAIL_USER,
-      pass: '^RAUt[(.Gls%' || process.env.EMAIL_PASS
+      pass: 'uOr0vPfwp4g]' || process.env.EMAIL_PASS
     }
   }
 
