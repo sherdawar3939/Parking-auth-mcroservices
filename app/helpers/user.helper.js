@@ -75,13 +75,17 @@ function signUp (input) {
       newUser.salt = newUser.makeSalt()
       newUser.hashedPassword = newUser.encryptPassword(input.password, newUser.salt)
       await newUser.save()
-
-      // send verification email/sms code here
-      const html = generalHelpingMethods.getTemplate('registration', {
+      const data = {
         name: newUser.fName,
         email: newUser.email,
         otp: newUser.otp
-      })
+      }
+      // send verification email/sms code here
+      let html
+      if (newUser.RoleId === 3 || newUser.RoleId === 4) {
+        html = generalHelpingMethods.getTemplate('appRegistration', data)
+      }
+      html = generalHelpingMethods.getTemplate('registration', data)
       await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', newUser.email, 'Please confirm your account', 'message', html)
 
       // end send email
