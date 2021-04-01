@@ -85,7 +85,7 @@ function signUp (input) {
       if (newUser.RoleId === 3 || newUser.RoleId === 4) {
         html = generalHelpingMethods.getTemplate('appRegistration', data)
       }
-      await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', newUser.email, 'Please confirm your account', 'message', html)
+      await generalHelpingMethods.sendEmail('<admin@gplroad.com>', newUser.email, 'Please confirm your account', 'message', html)
 
       // end send email
       return {
@@ -413,7 +413,7 @@ function forgotPassword (conditions) {
           html = generalHelpingMethods.getTemplate('webForgetPassword', data)
         }
         // Send email
-        await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', response.dataValues.email, 'Please confirm your account', 'message', html)
+        await generalHelpingMethods.sendEmail('<admin@gplroad.com>', response.dataValues.email, 'Please confirm your account', 'message', html)
         console.log('Send email', user)
         return true
       })
@@ -747,7 +747,7 @@ function resendOtp (input) {
           html = generalHelpingMethods.getTemplate('webForgetPassword', data)
         }
         // Send email
-        await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', response.dataValues.email, 'Please confirm your account', 'message', html)
+        await generalHelpingMethods.sendEmail('<admin@gplroad.com>', response.dataValues.email, 'Please confirm your account', 'message', html)
         console.log('Send email', user)
         return true
       })
