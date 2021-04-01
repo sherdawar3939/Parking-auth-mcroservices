@@ -23,7 +23,7 @@ function standardErrorResponse (req, res, err, type, statusCode) {
     reason: 'Validation Error'
   }
 
-  winston.info(logData)
+  // winston.info(logData)
   logError(logData)
 
   return res.status(code)

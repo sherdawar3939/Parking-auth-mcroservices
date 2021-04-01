@@ -19,7 +19,7 @@ function checkIfUserHasPermission (permissionName, permissionsArray) {
 }
 
 function rejectPromise (message, code = null) {
-  winston.error(message)
+  // winston.error(message)
   return new PromiseReturns(function (resolve, reject) {
     reject(new StandardError({
       status: 'Error',
@@ -30,7 +30,7 @@ function rejectPromise (message, code = null) {
 }
 
 function catchException (err) {
-  winston.error(err)
+  // winston.error(err)
   return rejectPromise(err.message, err.statusCode)
 }
 
@@ -113,23 +113,30 @@ const getTemplate = (type, data) => {
   if (process.env.NODE_ENV !== 'production') {
     ref = 'http://localhost:4200/auth/verify/'
   }
+
   switch (type) {
     case 'registration':
-      html = `<h1>Email Confirmation</h1>
+      html = `<h1>Account Verification</h1>
       <h2>Hello ${data.name}</h2>
       <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
       <a href=${ref}${data.otp}/${data.email}> Click here</a>`
       break
+    case 'appRegistration':
+      html = `<h1>Account Verification</h1>
+      <h2>Hello ${data.name}</h2>
+      <p>Your account verification OTP is</p>
+      <p>${data.otp}</p>`
+      break
     case 'webForgetPassword':
-      html = `<h1>Email Confirmation</h1>
+      html = `<h1>Password Reset</h1>
       <h2>Hello ${data.name}</h2>
       <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
       <a href=${ref}${data.otp}/${data.email}> Click here</a>`
       break
     case 'appForgetPassword':
-      html = `<h1>Email Confirmation</h1>
+      html = `<h1>Password Reset OTP</h1>
         <h2>Hello ${data.name}</h2>
-        <p>Your Otp number is</p>
+        <p>Your Otp is</p>
         <p>${data.otp}</p>`
       break
     default:
