@@ -77,11 +77,11 @@ function uploadImageToS3 (imageFile) {
 const sendEmail = async (fromEmail, toEmail, subject, textMessage, htmlPage) => {
   let mailService = {
     // service: 'gmail',
-    host: 'mail.webhudlab.com',
+    host: 'mail.gplroad.com',
     port: 465,
     secure: true,
     auth: {
-      user: 'admin@webhudlab.com' || process.env.EMAIL_USER,
+      user: 'admin@gplroad.com' || process.env.EMAIL_USER,
       pass: 'uOr0vPfwp4g]' || process.env.EMAIL_PASS
     }
   }
