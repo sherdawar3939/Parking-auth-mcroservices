@@ -109,7 +109,7 @@ const sendEmail = async (fromEmail, toEmail, subject, textMessage, htmlPage) => 
 
 const getTemplate = (type, data) => {
   let html = ''
-  let ref = 'http://parking-api.webhudlab.com/auth/verify/'
+  let ref = 'https://parkingclient.gplroad.com/auth/verify/'
   if (process.env.NODE_ENV !== 'production') {
     ref = 'http://localhost:4200/auth/verify/'
   }
