@@ -81,11 +81,10 @@ function signUp (input) {
         otp: newUser.otp
       }
       // send verification email/sms code here
-      let html
+      let html = generalHelpingMethods.getTemplate('registration', data)
       if (newUser.RoleId === 3 || newUser.RoleId === 4) {
         html = generalHelpingMethods.getTemplate('appRegistration', data)
       }
-      html = generalHelpingMethods.getTemplate('registration', data)
       await generalHelpingMethods.sendEmail('<admin@webhudlab.com>', newUser.email, 'Please confirm your account', 'message', html)
 
       // end send email
