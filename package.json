@@ -13,7 +13,7 @@
   "license": "ISC",
   "homepage": "https://www.visionbotix.com/",
   "dependencies": {
-    "@sendgrid/mail": "^6.4.0",
+    "@sendgrid/mail": "^6.5.5",
     "amqplib": "^0.5.5",
     "aws-sdk": "^2.600.0",
     "bluebird": "^3.5.3",

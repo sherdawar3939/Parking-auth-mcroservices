@@ -8,6 +8,7 @@ var StandardError = require('standard-error')
 var _ = require('lodash')
 var fs = require('fs')
 var nodemailer = require('nodemailer')
+const sgMail = require('@sendgrid/mail')
 // Check if user has permission or not
 function checkIfUserHasPermission (permissionName, permissionsArray) {
   for (let i = 0; i < permissionsArray.length; i++) {
@@ -143,6 +144,28 @@ const getTemplate = (type, data) => {
   }
   return html
 }
+
+const sendEmailUsingSendGrid = async (fromEmail, toEmail, subject, textMessage, htmlPage) => {
+  const API_KEY = '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' || process.env.SENDGRID_API_KEY
+  sgMail.setApiKey(API_KEY)
+  const msg = {
+    to: toEmail, // Change to your recipient
+    from: fromEmail, // Change to your verified sender
+    subject: subject,
+    text: textMessage,
+    html: htmlPage
+  }
+  console.log('mail function call')
+  sgMail
+    .send(msg)
+    .then((response) => {
+      console.log('send email')
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
 module.exports = {
   checkIfUserHasPermission,
   rejectPromise,
@@ -150,6 +173,6 @@ module.exports = {
   putS3Object,
   uploadImageToS3,
   sendEmail,
-  getTemplate
-
+  getTemplate,
+  sendEmailUsingSendGrid
 }
