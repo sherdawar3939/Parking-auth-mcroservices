@@ -85,7 +85,7 @@ function signUp (input) {
       if (newUser.RoleId === 3 || newUser.RoleId === 4) {
         html = generalHelpingMethods.getTemplate('appRegistration', data)
       }
-      await generalHelpingMethods.sendEmail('<admin@gplroad.com>', newUser.email, 'Please confirm your account', 'message', html)
+      await generalHelpingMethods.sendEmail('<admin@gplroad.com>', newUser.email, 'Please verify your account', 'message', html)
 
       // end send email
       return {
