@@ -156,7 +156,7 @@ const sendEmailUsingSendGrid = async (fromEmail, toEmail, subject, textMessage, 
     html: htmlPage
   }
   console.log('mail function call')
-  sgMail
+  return sgMail
     .send(msg)
     .then((response) => {
       console.log('send email')

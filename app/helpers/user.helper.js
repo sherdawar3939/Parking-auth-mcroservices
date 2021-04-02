@@ -154,6 +154,8 @@ const login = (input) => {
       let query = ''
       if (role.id === 2) {
         query = `select id from Clients where UserId = ${userData.userInfo.id} and isProfile = true`
+      } else if (role.id == 4) {
+        query = `select id from Inspectors where UserId = ${userData.userInfo.id}`
       }
 
       if (query) {
