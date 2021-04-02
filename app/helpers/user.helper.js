@@ -85,11 +85,7 @@ function signUp (input) {
       if (newUser.RoleId === 3 || newUser.RoleId === 4) {
         html = generalHelpingMethods.getTemplate('appRegistration', data)
       }
-<<<<<<< HEAD
       await generalHelpingMethods.sendEmailUsingSendGrid('hamzaaslam769@gmail.com', newUser.email, 'Please confirm your account', 'message', html)
-=======
-      await generalHelpingMethods.sendEmail('<admin@gplroad.com>', newUser.email, 'Please verify your account', 'message', html)
->>>>>>> 2d6c8c0f06cbb59a078d05f9134f28bc437957eb
 
       // end send email
       return {
@@ -158,6 +154,8 @@ const login = (input) => {
       let query = ''
       if (role.id === 2) {
         query = `select id from Clients where UserId = ${userData.userInfo.id} and isProfile = true`
+      } else if (role.id == 4) {
+        query = `select id from Inspectors where UserId = ${userData.userInfo.id}`
       }
 
       if (query) {
