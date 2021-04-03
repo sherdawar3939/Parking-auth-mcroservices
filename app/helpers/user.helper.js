@@ -155,7 +155,7 @@ const login = (input) => {
       if (role.id === 2) {
         query = `select id from Clients where UserId = ${userData.userInfo.id} and isProfile = true`
       } else if (role.id == 4) {
-        query = `select id from Inspectors where UserId = ${userData.userInfo.id}`
+        query = `select id, ClientId from Inspectors where UserId = ${userData.userInfo.id}`
       }
 
       if (query) {
@@ -165,6 +165,9 @@ const login = (input) => {
           .then((result) => {
             if (result && result.length) {
               userData.userInfo.employeeId = result[0].id
+              if (result[0].ClientId) {
+                userData.userInfo.ClientId = result[0].ClientId
+              }
             }
           })
       }
@@ -210,6 +213,9 @@ const login = (input) => {
 
       if (userData.userInfo.employeeId) {
         tokenData.employeeId = userData.userInfo.employeeId
+      }
+      if (userData.userInfo.ClientId) {
+        tokenData.ClientId = userData.userInfo.ClientId
       }
 
       userData.userInfo = {
