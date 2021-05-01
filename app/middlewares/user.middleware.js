@@ -2,6 +2,8 @@
 const generalMiddleware = require('./general.middleware')
 const emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 const _ = require('lodash')
+const uuid = require('uuid/v4')
+
 // signUp validation
 const validateSignUp = (req, res, done) => {
   const body = req.body
@@ -43,13 +45,16 @@ const validateSignUp = (req, res, done) => {
     validatedData.email = body.email
   }
 
-  // phone is optional, validating it as not empty, valid String and length range.
-  if (!_.isString(body.phone) || body.phone.length < 11 || body.phone.length > 11) {
-    errorArray.push({
-      field: 'phone',
-      error: 1009,
-      message: '\'phone\' is required as string, length must be 11.'
-    })
+  // validating as optional string field
+  if (body.hasOwnProperty('phone') && body.phone) {
+    if (body.phone.length < 11 || body.phone.length > 16) {
+      errorArray.push({
+        field: 'phone',
+        error: 1009,
+        message: 'The phone should be string with min 11 and max 16 characters.'
+      })
+    }
+    validatedData.phone = body.phone
   }
 
   // language is required, validating it as not empty, valid String and length range.
@@ -104,6 +109,12 @@ const validateSignUp = (req, res, done) => {
   validatedData.password = body.password
   // validatedData.language = body.language
   validatedData.RoleId = body.RoleId
+
+  if (validatedData.RoleId === 3) {
+    validatedData.otp = Math.round(Math.random() * 9000 + 1000)
+  } else {
+    validatedData.otp = uuid()
+  }
 
   req.validatedBody = validatedData
   done()

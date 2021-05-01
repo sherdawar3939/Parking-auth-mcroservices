@@ -1,5 +1,4 @@
 'use strict'
-var uuid = require('uuid/v4')
 
 const SERVER_RESPONSE = require('../config/serverResponses')
 const db = require('../config/sequelize.config')
@@ -7,7 +6,7 @@ const generalHelpingMethods = require('./general.helper')
 const helpingHelperMethods = require('./helping.helper')
 const _ = require('lodash')
 const Op = db.Sequelize.Op
-/// ///
+const uuid = require('uuid/v4')
 
 // User signUp
 function signUp (input) {
@@ -18,7 +17,7 @@ function signUp (input) {
     fName: input.fName,
     lName: input.lName,
     email: input.email || '',
-    otp: uuid(),
+    otp: input.otp,
     otpValidTill: now,
     phone: input.phone,
     language: input.language,
@@ -26,9 +25,23 @@ function signUp (input) {
     // signupDevice: input.signupDevice || null
   }
 
+  const userFindConditions = []
+  if (userObj.email) {
+    userFindConditions.push({
+      email: userObj.email
+    })
+  }
+
+  if (userObj.phone) {
+    userFindConditions.push({
+      phone: userObj.phone
+    })
+  }
+
   // check if input phone already exist
   return db.User.findOne({
     where: {
+<<<<<<< HEAD
       [Op.or]: [{
         phone: userObj.phone
       },
@@ -36,6 +49,9 @@ function signUp (input) {
         email: userObj.email
       }
       ],
+=======
+      [Op.or]: userFindConditions,
+>>>>>>> c526b9f5c94fdf548326bf464ec329ed56bd315c
       isDeleted: false
     }
   })
@@ -69,14 +85,17 @@ function signUp (input) {
       newUser.salt = newUser.makeSalt()
       newUser.hashedPassword = newUser.encryptPassword(input.password, newUser.salt)
       await newUser.save()
-
-      // send verification email/sms code here
-
-      await generalHelpingMethods.sendEmail({
+      const data = {
+        name: newUser.fName,
         email: newUser.email,
-        code: newUser.otp,
-        userName: newUser.fName
-      })
+        otp: newUser.otp
+      }
+      // send verification email/sms code here
+      let html = generalHelpingMethods.getTemplate('registration', data)
+      if (newUser.RoleId === 3 || newUser.RoleId === 4) {
+        html = generalHelpingMethods.getTemplate('appRegistration', data)
+      }
+      await generalHelpingMethods.sendEmailUsingSendGrid('hamzaaslam769@gmail.com', newUser.email, 'Please confirm your account', 'message', html)
 
       // end send email
       return {
@@ -96,7 +115,7 @@ function signUp (input) {
 }
 
 // user Login
-const login = async (input) => {
+const login = (input) => {
   let email = input.email
   let password = input.password
   let userData = {}
@@ -146,6 +165,8 @@ const login = async (input) => {
       let query = ''
       if (role.id === 2) {
         query = `select id from Clients where UserId = ${userData.userInfo.id} and isProfile = true`
+      } else if (role.id == 4) {
+        query = `select id, ClientId from Inspectors where UserId = ${userData.userInfo.id}`
       }
 
       if (query) {
@@ -155,6 +176,9 @@ const login = async (input) => {
           .then((result) => {
             if (result && result.length) {
               userData.userInfo.employeeId = result[0].id
+              if (result[0].ClientId) {
+                userData.userInfo.ClientId = result[0].ClientId
+              }
             }
           })
       }
@@ -198,6 +222,9 @@ const login = async (input) => {
 
       if (userData.userInfo.employeeId) {
         tokenData.employeeId = userData.userInfo.employeeId
+      }
+      if (userData.userInfo.ClientId) {
+        tokenData.ClientId = userData.userInfo.ClientId
       }
 
       userData.userInfo = {
@@ -380,24 +407,33 @@ function forgotPassword (conditions) {
           message: 'No user found against this phone/email'
         }])
       }
-
+      // console.log(user)
       let now = new Date()
       now.setMinutes(now.getMinutes() + 10) // timestamp
       now = new Date(now) // Date object
 
       user.otpValidTill = now
-      user.otp = Math.round(Math.random() * 9000 + 1000)
-      user.save().then(() => {
-        if (conditions.phone) {
-          // Send sms
-          console.log('Send sms', user)
-        } else {
-          // Send email
-          console.log('Send email', user)
+      user.otp = uuid()
+      if (user.dataValues.RoleId === 3 || user.dataValues.RoleId === 4) {
+        user.otp = Math.round(Math.random() * 9000 + 1000)
+      }
+      return user.save().then(async (response) => {
+        let html
+        const data = {
+          name: response.dataValues.fName,
+          email: response.dataValues.email,
+          otp: response.otp
         }
+        if (response.dataValues.RoleId === 3 || response.dataValues.RoleId === 4) {
+          html = generalHelpingMethods.getTemplate('appForgetPassword', data)
+        } else {
+          html = generalHelpingMethods.getTemplate('webForgetPassword', data)
+        }
+        // Send email
+        await generalHelpingMethods.sendEmailUsingSendGrid('<admin@gplroad.com>', response.dataValues.email, 'Please confirm your account', 'message', html)
+        console.log('Send email', user)
+        return true
       })
-
-      return true
     })
 }
 
@@ -595,6 +631,7 @@ const updateUser = (id, data) => {
       return user.toJSON()
     })
 }
+
 // update current user profile
 const updateCurrentUserProfile = (conditions, data) => {
   console.log('print conditions', conditions)
@@ -651,18 +688,14 @@ function verifyOtp (input, res) {
     .then((user) => {
       if (!user) {
         // user not found, throw error
-        return res.json({
-          data: false
-        })
+        return false
       }
 
       // user.otp = parseInt(user.otp, 10)
 
       // matching otp against user verification code
       if (otp !== user.otp || Date.parse(user.otpValidTill) < Date.parse(new Date())) {
-        return res.json({
-          data: false
-        })
+        return false
       }
 
       user.otp = ''
@@ -671,6 +704,7 @@ function verifyOtp (input, res) {
       return true
     })
 }
+
 const confirmUserHelper = (otp) => {
   console.log('helper ', otp)
   return db.User.findOne({ where: { otp, isBlocked: false } })
@@ -691,6 +725,7 @@ const confirmUserHelper = (otp) => {
       return true
     })
 }
+
 // Resend otp
 function resendOtp (input) {
   let email = input.email
@@ -712,11 +747,27 @@ function resendOtp (input) {
       now = new Date(now) // Date object
 
       user.otpValidTill = now
-      user.otp = Math.round(Math.random() * 9000 + 1000)
-      user.save()
-
-      // Send otp
-      return true
+      user.otp = uuid()
+      if (user.dataValues.RoleId === 3 || user.dataValues.RoleId === 4) {
+        user.otp = Math.round(Math.random() * 9000 + 1000)
+      }
+      return user.save().then(async (response) => {
+        let html
+        const data = {
+          name: response.dataValues.fName,
+          email: response.dataValues.email,
+          otp: response.otp
+        }
+        if (response.dataValues.RoleId === 3 || response.dataValues.RoleId === 4) {
+          html = generalHelpingMethods.getTemplate('appForgetPassword', data)
+        } else {
+          html = generalHelpingMethods.getTemplate('webForgetPassword', data)
+        }
+        // Send email
+        await generalHelpingMethods.sendEmailUsingSendGrid('<admin@gplroad.com>', response.dataValues.email, 'Please confirm your account', 'message', html)
+        console.log('Send email', user)
+        return true
+      })
     })
 }
 
@@ -824,6 +875,119 @@ function addNewUser (input) {
     })
 }
 
+const refreshTokenHelper = (id) => {
+  let userData = {}
+
+  // check if email exist and isDeleted equal to false
+  return db.User.findOne({ where: { id, isDeleted: false } })
+    .then((user) => {
+      if (!user) {
+        // user not found, throw error
+        return generalHelpingMethods.rejectPromise([{
+          field: 'id',
+          error: 1540,
+          message: 'Invalid user id'
+        }])
+      } else {
+        // convert mongoose document object to plain json object and return user
+        return user.toJSON()
+      }
+    })
+    .then((user) => {
+      userData.userInfo = user
+      return db.Role.findOne({
+        where: {
+          id: user.RoleId,
+          isDeleted: false,
+          isActive: true }
+      })
+    })
+    .then(async (role) => {
+      if (!role) {
+        // Active and not deleted role not found, throw error
+        return generalHelpingMethods.rejectPromise([{
+          field: 'Role',
+          error: 1546,
+          message: 'Role is not defined'
+        }])
+      }
+      userData.userInfo.role = role.name
+      let query = ''
+      if (role.id === 2) {
+        query = `select id from Clients where UserId = ${userData.userInfo.id} and isProfile = true`
+      }
+
+      if (query) {
+        await db.sequelize.query(query, {
+          type: db.sequelize.QueryTypes.SELECT
+        })
+          .then((result) => {
+            if (result && result.length) {
+              userData.userInfo.employeeId = result[0].id
+            }
+          })
+      }
+
+      await db.Permission.findAll({
+        where: { RoleId: userData.userInfo.RoleId },
+        attributes: ['ModuleActionId']
+      })
+        .then(async (result) => {
+          if (result) {
+            let moduleActionIds = result.map(x => x.ModuleActionId)
+            await db.Module.findAll({
+              attributes: ['title', 'identifier'],
+              include: [
+                {
+                  model: db.Action,
+                  required: true,
+                  as: 'actions',
+                  attributes: ['title', 'identifier'],
+                  through: {
+                    where: { id: moduleActionIds },
+                    attributes: []
+                  }
+                }
+              ]
+            }).then(result => {
+              userData.userInfo.permissions = result
+            })
+          } else {
+            userData.userInfo.permissions = []
+          }
+        })
+
+      const tokenData = {
+        id: userData.userInfo.id,
+        fName: userData.userInfo.fName,
+        lName: userData.userInfo.lName,
+        email: userData.userInfo.email,
+        phone: userData.userInfo.phone,
+        RoleId: userData.userInfo.RoleId,
+        role: role.name
+      }
+
+      if (userData.userInfo.employeeId) {
+        tokenData.employeeId = userData.userInfo.employeeId
+      }
+
+      userData.userInfo = {
+        ...tokenData,
+        permissions: userData.userInfo.permissions,
+        isVerified: userData.userInfo.isVerified,
+        isBlocked: userData.userInfo.isBlocked,
+        language: userData.userInfo.language
+      }
+
+      return helpingHelperMethods.signLoginData({ data: tokenData })
+    })
+    .then((tokenData) => {
+      userData.tokenInfo = tokenData
+      return userData
+    })
+    .catch(generalHelpingMethods.catchException)
+}
+
 module.exports = {
   signUp,
   login,
@@ -842,5 +1006,6 @@ module.exports = {
   addNewUser,
   loginPhone,
   updateCurrentUserProfile,
-  confirmUserHelper
+  confirmUserHelper,
+  refreshTokenHelper
 }
