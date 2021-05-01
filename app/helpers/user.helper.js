@@ -29,18 +29,17 @@ function signUp (input) {
   // check if input phone already exist
   return db.User.findOne({
     where: {
-      [Op.or]: [
-        {
-          phone: userObj.phone
-        },
-        {
-          email: userObj.email
-        }
+      [Op.or]: [{
+        phone: userObj.phone
+      },
+      {
+        email: userObj.email
+      }
       ],
       isDeleted: false
     }
   })
-    // execute all these functions
+  // execute all these functions
     .then(async (user) => {
       const errorsArray = []
       // check user existence
@@ -130,7 +129,8 @@ const login = async (input) => {
         where: {
           id: user.RoleId,
           isDeleted: false,
-          isActive: true }
+          isActive: true
+        }
       })
     })
     .then(async (role) => {
@@ -168,18 +168,16 @@ const login = async (input) => {
             let moduleActionIds = result.map(x => x.ModuleActionId)
             await db.Module.findAll({
               attributes: ['title', 'identifier'],
-              include: [
-                {
-                  model: db.Action,
-                  required: true,
-                  as: 'actions',
-                  attributes: ['title', 'identifier'],
-                  through: {
-                    where: { id: moduleActionIds },
-                    attributes: []
-                  }
+              include: [{
+                model: db.Action,
+                required: true,
+                as: 'actions',
+                attributes: ['title', 'identifier'],
+                through: {
+                  where: { id: moduleActionIds },
+                  attributes: []
                 }
-              ]
+              }]
             }).then(result => {
               userData.userInfo.permissions = result
             })
@@ -309,9 +307,9 @@ function loginPhone (input) {
       }
 
       const sql = 'SELECT r.name as UC, r1.name as Tehsil, r1.id as TehsilId, r2.name as District, r2.id as DistrictId FROM Regions r' +
-        ' INNER JOIN Regions r1 ON r.ParentId = r1.id' +
-        ' INNER JOIN Regions r2 ON r1.ParentId = r2.id' +
-        ' WHERE r.id=' + employee[0].RegionId
+                ' INNER JOIN Regions r1 ON r.ParentId = r1.id' +
+                ' INNER JOIN Regions r2 ON r1.ParentId = r2.id' +
+                ' WHERE r.id=' + employee[0].RegionId
 
       const region = await db.sequelize.query(sql, {
         type: db.sequelize.QueryTypes.SELECT
@@ -776,7 +774,7 @@ function addNewUser (input) {
 
   // check if input email already exist
   return db.User.findOne({ where: { email: userObj.email } })
-    // execute all these functions
+  // execute all these functions
     .then(async (user) => {
       const errorsArray = []
       // // check user existence
@@ -801,7 +799,9 @@ function addNewUser (input) {
       if (input.RoleId === 2) { // This is supervisor
         db.sequelize.query('INSERT INTO Supervisors (firstName, lastName, email, phoneNo, UserId, createdAt, updatedAt) VALUES (:fName, :lName, :email, :phone, :userId, :dateTime, :dateTime);', {
           replacements: {
-            ...userObj, userId: newUser.id, dateTime: new Date().toLocaleString()
+            ...userObj,
+            userId: newUser.id,
+            dateTime: new Date().toLocaleString()
           },
           type: db.sequelize.QueryTypes.INSERT
         })

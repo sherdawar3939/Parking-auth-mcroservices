@@ -25,24 +25,24 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 let sequelize =
-  new Sequelize(process.env.DB_DATABASE || configDb.database, process.env.DB_USERNAME || configDb.username, process.env.DB_PASSWORD || configDb.password, {
-    host: process.env.DB_HOSTNAME || configDb.host,
-    port: 3306,
-    dialect: 'mysql'
-    // dialectOptions: {
-    //   ssl: {
-    //     ca: fs.readFileSync(process.cwd() + '/BaltimoreCyberTrustRoot.crt.pem')
-    //   }
-    // }
-    // query:{raw:true}
-  })
+    new Sequelize(process.env.DB_DATABASE || configDb.database, process.env.DB_USERNAME || configDb.username, process.env.DB_PASSWORD || configDb.password, {
+      host: process.env.DB_HOSTNAME || configDb.host,
+      port: 3306,
+      dialect: 'mysql'
+      // dialectOptions: {
+      //   ssl: {
+      //     ca: fs.readFileSync(process.cwd() + '/BaltimoreCyberTrustRoot.crt.pem')
+      //   }
+      // }
+      // query:{raw:true}
+    })
 
 // loop through all files in models directory ignoring hidden files and this file
 fs.readdirSync(appConfig.computedConfig.modelsDir)
   .filter(function (file) {
     return (file.indexOf('.') !== 0) && (file !== 'index.js')
   })
-  // import model files and save model names
+// import model files and save model names
   .forEach(function (file) {
     // winston.info('Loading model file ' + file)
     var model = sequelize.import(path.join(appConfig.computedConfig.modelsDir, file))
