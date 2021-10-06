@@ -41,17 +41,7 @@ function signUp (input) {
   // check if input phone already exist
   return db.User.findOne({
     where: {
-<<<<<<< HEAD
-      [Op.or]: [{
-        phone: userObj.phone
-      },
-      {
-        email: userObj.email
-      }
-      ],
-=======
       [Op.or]: userFindConditions,
->>>>>>> c526b9f5c94fdf548326bf464ec329ed56bd315c
       isDeleted: false
     }
   })

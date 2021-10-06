@@ -20,17 +20,25 @@ const validateSignUp = (req, res, done) => {
   }
 
   // lName is an optional string property, if it is given than validate it.
-  if (body.hasOwnProperty('lName') && body.lName) {
-    // Validating as not empty, valid String and length range.
-    if (!_.isString(body.lName) || body.lName.length < 2 || body.lName.length > 100) {
-      errorArray.push({
-        field: 'lName',
-        error: 1003,
-        message: 'Please provide only valid \'lName\' as string, length must be between 2 and 100.'
-      })
-    }
-    validatedData.lName = body.lName
+
+  if(_.isEmpty(body.lName) || !_.isString(body.lName) || body.lName.length < 2 || body.lName.length > 100 ){
+    errorArray.push([{
+      field:'lName',
+      error:1003,
+      message:'please provide only  lName of valid length'
+    }])
   }
+  // if (body.hasOwnProperty('lName') && body.lName) {
+  //   // Validating as not empty, valid String and length range.
+  //   if (!_.isString(body.lName) || body.lName.length < 2 || body.lName.length > 100) {
+  //     errorArray.push({
+  //       field: 'lName',
+  //       error: 1003,
+  //       message: 'Please provide only valid \'lName\' as string, length must be between 2 and 100.'
+  //     })
+  //   }
+  //   validatedData.lName = body.lName
+  // }
 
   // email is an required string property, if it is given than validate it.
   if (body.hasOwnProperty('email') && body.email) {
@@ -104,6 +112,7 @@ const validateSignUp = (req, res, done) => {
 
   validatedData.fName = body.fName
   validatedData.lName = body.lName
+  // validatedData.lName = body.lName
   validatedData.email = body.email
   validatedData.phone = body.phone
   validatedData.password = body.password
@@ -463,7 +472,7 @@ const validateResetPassword = (req, res, done) => {
   }
 
   // otp is required, validating as not empty, valid numeric value with range.
-  if (!body.otp || isNaN(body.otp) || body.otp < 1000 || body.otp > 9999) {
+  if (!body.otp || isNaN(body.otp) || body.otp < 3 || body.otp > 9999) {
     errorArray.push({
       field: 'otp',
       error: 1193,
